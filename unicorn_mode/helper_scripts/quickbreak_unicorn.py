@@ -17,7 +17,7 @@ parser.add_argument('-p', '--port', help="Port to listen to.", action="store")
 parser.add_argument('-d', '--debug', default=False, action="store_true", help="Dump all commandline info.")
 parser.add_argument('--attach', default=False, action="store_true", help="Attach to running program.")
 parser.add_argument('-dr', '--dump-regs', default=False, action="store_true", help="Dump regs at given breakpoint to terminal.")
-parser.add_argument('-y', '--force-yes', default=False, action="store_true", help="Skip the continue (please run once without this option).")
+parser.add_argument('-y', '--force-yes', default=False, action="store_true", help="Skip the continue and intro (please run once without this option).")
 args = parser.parse_args()
 
 
