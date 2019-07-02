@@ -163,7 +163,8 @@ if ans == 'y':
                 try:
                     index_file_path = os.path.join(os.getcwd() + "/herelolol", "_index.json")
                     if not os.path.isfile(index_file_path):
-                        raise Exception("Index file not found. Expected it to be at {}".format(index_file_path))
+                        print("[-] Something went wrong, the json index file wasn't found.")
+                        failed = True
                     index_file = open(index_file_path, 'r')
                     context = json.load(index_file)
                     print("Dump at breakpoint " + args.breakpoint + ":")
