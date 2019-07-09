@@ -15,6 +15,7 @@ parser.add_argument('-dump', '--path-to-dumper', help="Looking for unicorn_dumpe
 parser.add_argument('-gdb', '--path-to-gdbserver', help="Looking for gdbserver on phone.  Default will be /data/local/tmp/gdbserver/gdbserver", action="store")
 parser.add_argument('-p', '--port', help="Port to listen to.", action="store")
 parser.add_argument('--attach', default=False, action="store_true", help="Attach to running process on device. Program name required (not PID).")
+parser.add_argument('--no-dumper', default=False, action="store_true", help="Don't use unicorn dumper, instead just open up a GDB session. ")
 parser.add_argument('-dr', '--dump-regs', default=False, action="store_true", help="Dump regs at current breakpoint to terminal.")
 parser.add_argument('-y', '--force-yes', default=False, action="store_true", help="Skip the continue and intro (please run once without this option).")
 parser.add_argument('-n', '--new-folder-name', help="Set the name of the new folder being made.  Default will be program-name_breakpoint", action="store")
@@ -155,7 +156,10 @@ if ans == 'y':
     if not failed:
         try:
             print("[*] Some useful output from program might show below ...")
-            os.system("arm-linux-gnueabi-gdb " + args.program + " < " + output_path + "> /dev/null 2>&1")
+            if not args.no_dumper:
+                os.system("arm-linux-gnueabi-gdb " + args.program + " < " + output_path + "> /dev/null 2>&1")
+            else:
+                os.system("arm-linux-gnueabi-gdb " + args.program)
         except:
             print("[-] Something went wrong with GDB ... either GDB isn't here, breakpoint didn't work, or the paths for the dumper/gef are off.  Trying '-d' might help.")
             failed = True
@@ -189,8 +193,9 @@ if ans == 'y':
                 subprocess.check_output("rm -r here...iguess UnicornContext*", shell=True)
                 failed = True
         except:
-            print("[-] Missing directory, something went wrong.  Were the paths correct?")
-            failed = True
+            if not args.no_dumper:
+                print("[-] Missing directory, something went wrong.  Were the paths correct?")
+                failed = True
 
     print("[*] Cleaning up :)")
     try:
