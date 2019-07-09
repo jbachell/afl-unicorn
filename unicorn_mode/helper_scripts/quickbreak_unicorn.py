@@ -26,7 +26,7 @@ args = parser.parse_args()
 if not args.force_yes:
     print("\nA few notes:\n\nIMPORTANT: PLEASE put program in current directory!!! \nThis program will not work without it there!\n"
           "I think I did a good job, but program is still in testing phase ... \n... So keep any eye out for bugs\n"
-          "Be careful about names! adb push will delete!\nALSO any UnicornContext* in current directory may delete!\n"
+          "Be careful about names! adb push will delete!\nALSO any UnicornContext* in current directory WILL delete!\n"
           "This is sorta a dumb program, just simulating commands.\n"
           "Errors should (hopefully) always be thrown ...\n...But the program doesn't acutally know what ran and didn't run ...\n..."
           "i.e. The program says GDB ran but it didn't actually run.\n"
@@ -40,6 +40,8 @@ else:
     ans = 'y'
 
 if ans == 'y':
+    # try:
+    # subprocess.check_output("rm -r UnicornContext*", shell=True)
     print("[+] Starting to parse arguments ...")
     failed = False
     try:
@@ -130,8 +132,8 @@ if ans == 'y':
             if not args.attach:
                 subprocess.check_output("adb push " + args.program + " /data/local/tmp", shell=True)
                 print("[+] Pushed program to /data/local/tmp")
-                os.system("adb shell su -c chmod +x /data/local/tmp/" + args.program + "> /dev/null 2>&1")
-                os.system("adb shell su -c " + args.path_to_gdbserver + " :" + args.port + " /data/local/tmp/" + args.program + " " + args.args_for_program + "> /dev/null 2>&1 &")
+                os.system("adb shell su -c chmod +x /data/local/tmp/" + args.program + " > /dev/null 2>&1")
+                os.system("adb shell su -c " + args.path_to_gdbserver + " :" + args.port + " /data/local/tmp/" + args.program + " " + args.args_for_program + " > /dev/null 2>&1 &")
             else:
                 output__path = "Instructions__attach" + timestamp
                 instruct = open(str(output__path), "w+")
@@ -157,7 +159,7 @@ if ans == 'y':
         try:
             print("[*] Some useful output from program might show below ...")
             if not args.no_dumper:
-                os.system("arm-linux-gnueabi-gdb " + args.program + " < " + output_path + "> /dev/null 2>&1")
+                os.system("arm-linux-gnueabi-gdb " + args.program + " < " + output_path + " > /dev/null 2>&1")
             else:
                 os.system("arm-linux-gnueabi-gdb " + args.program)
         except:
@@ -171,11 +173,17 @@ if ans == 'y':
 
     if not failed:
         try:
-            os.system("cp -r UnicornContext* " + "here...iguess")
+            if not os.path.exists("here_it_is_so_smile"):
+                os.makedirs("here_it_is_so_smile")
+            else:
+                print("[-] Do you have some weird folder names? Change them!")
+                failed = True
+            os.system("cp -r UnicornContext* " + "here_it_is_so_smile")
             if args.dump_regs:
+                print("[-] Currently, there are weird issues with dump_regs.  Please just look at the _index.json file instead! Thx :)")
                 print("[*] Preparing to print registers ...")
                 try:
-                    index_file_path = os.path.join(os.getcwd() + "/here...iguess", "_index.json")
+                    index_file_path = os.path.join(os.getcwd() + "/here_it_is_so_smile", "_index.json")
                     if not os.path.isfile(index_file_path):
                         print("[-] Something went wrong, the json index file wasn't found.")
                         failed = True
@@ -188,9 +196,9 @@ if ans == 'y':
                     print("[+] Registers dumped!")
                 except:
                     print("[-] Reading registers failed. Is json installed?")
-            if len(os.listdir(os.getcwd() + '/here...iguess')) == 0:
+            if len(os.listdir(os.getcwd() + '/here_it_is_so_smile')) == 0:
                 print("[-] Unicorn failed to dump.  Try the '-d' option.  Maybe the listener isn't up?")
-                subprocess.check_output("rm -r here...iguess UnicornContext*", shell=True)
+                subprocess.check_output("rm -r here_it_is_so_smile UnicornContext*", shell=True)
                 failed = True
         except:
             if not args.no_dumper:
@@ -211,7 +219,7 @@ if ans == 'y':
         if not os.path.exists(output_path1):
               os.makedirs(output_path1)
         os.system("mv UnicornContext* " + args.new_folder_name)
-        subprocess.check_output("rm -r here...iguess", shell=True)
+        subprocess.check_output("rm -r here_it_is_so_smile", shell=True)
         print("[+] All set! Look for new directory named " + args.new_folder_name)
 
     if failed:
