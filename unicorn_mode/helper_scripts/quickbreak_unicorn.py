@@ -161,6 +161,7 @@ if ans == 'y':
             if not args.no_dumper:
                 os.system("arm-linux-gnueabi-gdb " + args.program + " < " + output_path + " > /dev/null 2>&1")
             else:
+                subprocess.check_output("rm " + output_path, shell=True)
                 os.system("arm-linux-gnueabi-gdb " + args.program)
         except:
             print("[-] Something went wrong with GDB ... either GDB isn't here, breakpoint didn't work, or the paths for the dumper/gef are off.  Trying '-d' might help.")
@@ -209,7 +210,6 @@ if ans == 'y':
     try:
         subprocess.check_output("adb shell su -c rm /data/local/tmp/" + args.program, shell=True)
         subprocess.check_output("adb forward --remove-all", shell=True)
-        subprocess.check_output("rm " + output_path, shell=True)
         if args.attach:
             subprocess.check_output("rm " + output__path, shell=True)
     except:
