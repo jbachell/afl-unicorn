@@ -210,6 +210,7 @@ if ans == 'y':
     try:
         subprocess.check_output("adb shell su -c rm /data/local/tmp/" + args.program, shell=True)
         subprocess.check_output("adb forward --remove-all", shell=True)
+        subprocess.check_output("rm " + output_path, shell=True)
         if args.attach:
             subprocess.check_output("rm " + output__path, shell=True)
     except:
